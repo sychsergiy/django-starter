@@ -7,3 +7,25 @@ services:
       - .:/django_starter
     ports:
       - "8000:8000"
+    depends_on:
+      - celery
+      - celery-beat
+
+  redis:
+    image: "redis:alpine"
+
+  celery:
+    build: .
+    command: celery -A django_starter worker -l info
+    volumes:
+      - .:/django_starter
+    depends_on:
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A django_starter beat -l info
+    volumes:
+      - .:/django_starter
+    depends_on:
+      - redis
